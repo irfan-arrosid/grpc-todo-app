@@ -25,7 +25,7 @@ func main() {
 	// Create a new TodoService client
 	client := pb.NewTodoServiceClient(conn)
 
-	// Call CreateTodo service
+	// ### Call CreateTodo service ###
 	reqCreateTodo := &pb.CreateTodoRequest{
 		Title:     "Sleeping",
 		Completed: false,
@@ -38,7 +38,7 @@ func main() {
 
 	fmt.Printf("Created Todo: ID=%d, Title=%s, Completed=%t\n", resCreateTodo.Id, resCreateTodo.Title, resCreateTodo.Completed)
 
-	// Call GetTodos service
+	// ### Call GetTodos service ###
 	reqGetTodos := &pb.GetTodosRequest{}
 
 	resGetTodos, err := client.GetTodos(context.Background(), reqGetTodos)
@@ -49,4 +49,18 @@ func main() {
 	for _, todo := range resGetTodos.TodoList {
 		fmt.Printf("Todo: ID=%d, Title=%s, Completed=%t\n", todo.Id, todo.Title, todo.Completed)
 	}
+
+	// ### Call UpdateTodo service ###
+	reqUpdateTodo := &pb.UpdateTodoRequest{
+		Id:        2,
+		Title:     "Dinner",
+		Completed: true,
+	}
+
+	resUpdateTodo, err := client.UpdateTodo(context.Background(), reqUpdateTodo)
+	if err != nil {
+		log.Fatal("Error to update todo", err.Error())
+	}
+
+	fmt.Printf("Updated Todo: ID=%d, Title=%s, Completed=%t\n", resUpdateTodo.Id, resUpdateTodo.Title, resUpdateTodo.Completed)
 }

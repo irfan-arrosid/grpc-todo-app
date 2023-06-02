@@ -59,6 +59,26 @@ func (s *server) GetTodos(ctx context.Context, req *pb.GetTodosRequest) (*pb.Get
 	}, nil
 }
 
+func (s *server) UpdateTodo(ctx context.Context, req *pb.UpdateTodoRequest) (*pb.UpdateTodoResponse, error) {
+	var todo Todo
+
+	s.db.First(&todo, req.Id)
+	if todo.ID == 0 {
+		return nil, fmt.Errorf("Todo not found")
+	}
+
+	todo.Title = req.Title
+	todo.Completed = req.Completed
+
+	s.db.Save(&todo)
+
+	return &pb.UpdateTodoResponse{
+		Id:        int64(todo.ID),
+		Title:     todo.Title,
+		Completed: todo.Completed,
+	}, nil
+}
+
 func main() {
 	// Connect to the PostgreSQL database
 	dsn := "host=localhost user=irfanarrosid password=at19ir97ar dbname=grpc-todo-app port=5432 sslmode=disable"
