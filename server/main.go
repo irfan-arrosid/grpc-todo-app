@@ -79,6 +79,19 @@ func (s *server) UpdateTodo(ctx context.Context, req *pb.UpdateTodoRequest) (*pb
 	}, nil
 }
 
+func (s *server) DeleteTodo(ctx context.Context, req *pb.DeleteTodoRequest) (*pb.DeleteTodoResponse, error) {
+	var todo Todo
+
+	s.db.First(&todo, req.Id)
+	if todo.ID == 0 {
+		return nil, fmt.Errorf("Todo not found")
+	}
+
+	s.db.Delete(&todo)
+
+	return &pb.DeleteTodoResponse{}, nil
+}
+
 func main() {
 	// Connect to the PostgreSQL database
 	dsn := "host=localhost user=irfanarrosid password=at19ir97ar dbname=grpc-todo-app port=5432 sslmode=disable"

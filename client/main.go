@@ -27,7 +27,7 @@ func main() {
 
 	// ### Call CreateTodo service ###
 	reqCreateTodo := &pb.CreateTodoRequest{
-		Title:     "Sleeping",
+		Title:     "Playing",
 		Completed: false,
 	}
 
@@ -52,8 +52,8 @@ func main() {
 
 	// ### Call UpdateTodo service ###
 	reqUpdateTodo := &pb.UpdateTodoRequest{
-		Id:        2,
-		Title:     "Dinner",
+		Id:        6,
+		Title:     "Washing",
 		Completed: true,
 	}
 
@@ -63,4 +63,17 @@ func main() {
 	}
 
 	fmt.Printf("Updated Todo: ID=%d, Title=%s, Completed=%t\n", resUpdateTodo.Id, resUpdateTodo.Title, resUpdateTodo.Completed)
+
+	// ### Call DeleteTodo service ###
+	reqDeleteTodo := &pb.DeleteTodoRequest{
+		Id: 8,
+	}
+
+	resDeleteTodo, err := client.DeleteTodo(context.Background(), reqDeleteTodo)
+	if err != nil {
+		log.Fatal("Error to delete todo", err.Error())
+	}
+
+	fmt.Printf("Deleted Todo: ID=%d", reqDeleteTodo.Id)
+	fmt.Println(resDeleteTodo)
 }
