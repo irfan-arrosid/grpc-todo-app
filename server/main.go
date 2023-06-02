@@ -39,6 +39,26 @@ func (s *server) CreateTodo(ctx context.Context, req *pb.CreateTodoRequest) (*pb
 	}, nil
 }
 
+func (s *server) GetTodos(ctx context.Context, req *pb.GetTodosRequest) (*pb.GetTodosResponse, error) {
+	var todos []*Todo
+
+	s.db.Find(&todos)
+
+	var resTodos []*pb.GetTodosResponse_Todo
+	for _, todo := range todos {
+		resTodo := &pb.GetTodosResponse_Todo{
+			Id:        int64(todo.ID),
+			Title:     todo.Title,
+			Completed: todo.Completed,
+		}
+		resTodos = append(resTodos, resTodo)
+	}
+
+	return &pb.GetTodosResponse{
+		TodoList: resTodos,
+	}, nil
+}
+
 func main() {
 	// Connect to the PostgreSQL database
 	dsn := "host=localhost user=irfanarrosid password=at19ir97ar dbname=grpc-todo-app port=5432 sslmode=disable"
