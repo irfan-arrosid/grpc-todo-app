@@ -82,8 +82,8 @@ func main() {
 	// Create a new TodoService client
 	client := pb.NewTodoServiceClient(conn)
 
-	// CreateTodo(client)
+	CreateTodo(client)
 	GetTodos(client)
-	// UpdateTodo(client)
-	// DeleteTodo(client)
+	UpdateTodo(client)
+	DeleteTodo(client)
 }
