@@ -6,28 +6,18 @@ import (
 	"log"
 
 	"google.golang.org/grpc"
+	"google.golang.org/grpc/credentials/insecure"
 
 	pb "github.com/irfan-arrosid/grpc-todo-app/proto"
 )
 
-func main() {
-	// Set up a connection to the server
-	var opts []grpc.DialOption
-	opts = append(opts, grpc.WithInsecure())
-	opts = append(opts, grpc.WithBlock())
+const (
+	port = ":8080"
+)
 
-	conn, err := grpc.Dial(":2020", opts...)
-	if err != nil {
-		log.Fatalln("Error in dial", err.Error())
-	}
-	defer conn.Close()
-
-	// Create a new TodoService client
-	client := pb.NewTodoServiceClient(conn)
-
-	// ### Call CreateTodo service ###
+func CreateTodo(client pb.TodoServiceClient) {
 	reqCreateTodo := &pb.CreateTodoRequest{
-		Title:     "Playing",
+		Title:     "Recording",
 		Completed: false,
 	}
 
@@ -37,8 +27,9 @@ func main() {
 	}
 
 	fmt.Printf("Created Todo: ID=%d, Title=%s, Completed=%t\n", resCreateTodo.Id, resCreateTodo.Title, resCreateTodo.Completed)
+}
 
-	// ### Call GetTodos service ###
+func GetTodos(client pb.TodoServiceClient) {
 	reqGetTodos := &pb.GetTodosRequest{}
 
 	resGetTodos, err := client.GetTodos(context.Background(), reqGetTodos)
@@ -49,11 +40,12 @@ func main() {
 	for _, todo := range resGetTodos.TodoList {
 		fmt.Printf("Todo: ID=%d, Title=%s, Completed=%t\n", todo.Id, todo.Title, todo.Completed)
 	}
+}
 
-	// ### Call UpdateTodo service ###
+func UpdateTodo(client pb.TodoServiceClient) {
 	reqUpdateTodo := &pb.UpdateTodoRequest{
-		Id:        6,
-		Title:     "Washing",
+		Id:        9,
+		Title:     "Studying",
 		Completed: true,
 	}
 
@@ -63,10 +55,11 @@ func main() {
 	}
 
 	fmt.Printf("Updated Todo: ID=%d, Title=%s, Completed=%t\n", resUpdateTodo.Id, resUpdateTodo.Title, resUpdateTodo.Completed)
+}
 
-	// ### Call DeleteTodo service ###
+func DeleteTodo(client pb.TodoServiceClient) {
 	reqDeleteTodo := &pb.DeleteTodoRequest{
-		Id: 8,
+		Id: 10,
 	}
 
 	resDeleteTodo, err := client.DeleteTodo(context.Background(), reqDeleteTodo)
@@ -76,4 +69,21 @@ func main() {
 
 	fmt.Printf("Deleted Todo: ID=%d", reqDeleteTodo.Id)
 	fmt.Println(resDeleteTodo)
+}
+
+func main() {
+	// Set up a connection to the server
+	conn, err := grpc.Dial("localhost"+port, grpc.WithTransportCredentials(insecure.NewCredentials()))
+	if err != nil {
+		log.Fatalln("Error in dial", err.Error())
+	}
+	defer conn.Close()
+
+	// Create a new TodoService client
+	client := pb.NewTodoServiceClient(conn)
+
+	// CreateTodo(client)
+	GetTodos(client)
+	// UpdateTodo(client)
+	// DeleteTodo(client)
 }

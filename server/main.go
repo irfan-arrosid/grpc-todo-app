@@ -5,18 +5,24 @@ import (
 	"fmt"
 	"log"
 	"net"
+	"os"
 
 	"google.golang.org/grpc"
 	"gorm.io/driver/postgres"
 	"gorm.io/gorm"
 
 	pb "github.com/irfan-arrosid/grpc-todo-app/proto"
+	"github.com/joho/godotenv"
+)
+
+const (
+	port = ":8080"
 )
 
 type Todo struct {
 	gorm.Model
-	Title     string
-	Completed bool
+	Title     string `gorm:"not null"`
+	Completed bool   `gorm:"not null"`
 }
 
 type server struct {
@@ -93,13 +99,15 @@ func (s *server) DeleteTodo(ctx context.Context, req *pb.DeleteTodoRequest) (*pb
 }
 
 func main() {
+	// Load environment variable
+	godotenv.Load()
+
 	// Connect to the PostgreSQL database
-	dsn := "host=localhost user=irfanarrosid password=at19ir97ar dbname=grpc-todo-app port=5432 sslmode=disable"
-	db, err := gorm.Open(postgres.Open(dsn), &gorm.Config{})
+	db, err := gorm.Open(postgres.Open(os.Getenv("DSN")), &gorm.Config{})
 	if err != nil {
 		log.Fatalf("failed to connect to database: %v", err)
 	}
-	fmt.Println("Database connecting is success")
+	log.Println("Database connecting is success")
 
 	// Automigrate the Todo struct to the PostgreSQL database
 	db.AutoMigrate(&Todo{})
@@ -111,11 +119,11 @@ func main() {
 	pb.RegisterTodoServiceServer(grpcServer, &server{db: db})
 
 	// Start listening on port
-	listen, err := net.Listen("tcp", ":2020")
+	listen, err := net.Listen("tcp", port)
 	if err != nil {
 		log.Fatalln("error to listen", err.Error())
 	}
-	log.Println("Server listening on port 2020")
+	log.Printf("Server listening on port localhost%v", port)
 
 	// Serve gRPC requests
 	if err := grpcServer.Serve(listen); err != nil {
