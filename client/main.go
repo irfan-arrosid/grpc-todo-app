@@ -4,6 +4,7 @@ import (
 	"context"
 	"fmt"
 	"log"
+	"math/rand"
 
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/credentials/insecure"
@@ -59,7 +60,7 @@ func UpdateTodo(client pb.TodoServiceClient) {
 
 func DeleteTodo(client pb.TodoServiceClient) {
 	reqDeleteTodo := &pb.DeleteTodoRequest{
-		Id: 10,
+		Id: int64(rand.Intn(30)),
 	}
 
 	resDeleteTodo, err := client.DeleteTodo(context.Background(), reqDeleteTodo)
